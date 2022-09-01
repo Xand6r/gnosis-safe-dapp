@@ -9,9 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@web3-react/core": "^6.1.9",
+    "@web3-react/injected-connector": "^6.0.7",
+    "antd": "^4.22.8",
+    "ethers": "^5.7.0",
     "next": "12.2.5",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-toastify": "^9.0.8",
+    "sass": "^1.54.8"
   },
   "devDependencies": {
     "@types/node": "18.7.14",
