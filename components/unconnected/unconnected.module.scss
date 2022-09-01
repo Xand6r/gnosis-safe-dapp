@@ -1,0 +1,15 @@
+@import "styles/variables.scss";
+
+.unconnected{
+    & > div{
+        margin: 0 auto;
+        margin-top: 50px;
+        position: relative;
+        height: 398px;
+        width: 415.2px;
+    }
+    h2{
+        margin: auto;
+        width: fit-content;
+    }
+}
