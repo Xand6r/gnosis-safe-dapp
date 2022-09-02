@@ -3,7 +3,7 @@ import Image from "next/image";
 import ConnectButton from 'components/connect';
 import styles from "./header.module.scss"
 
-const Home: NextPage = () => {
+const Header: NextPage = () => {
   return (
     <header className={styles.header}>
       <span>
@@ -14,4 +14,4 @@ const Home: NextPage = () => {
   )
 }
 
-export default Home
+export default Header
