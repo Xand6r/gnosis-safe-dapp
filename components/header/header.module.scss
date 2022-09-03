@@ -1,0 +1,14 @@
+@import "styles/variables.scss";
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    padding-left: 40px;
+    padding: 30px $desktop-padding-x;
+
+    & > span{
+        position: relative;
+        width: 180px;
+        height: 50px;
+    }
+}
