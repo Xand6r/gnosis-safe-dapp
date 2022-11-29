@@ -1,0 +1,22 @@
+@import "styles/variables.scss";
+
+.nosafe{
+    margin: auto;
+    & > div{
+        margin: 0 auto;
+        margin-top: 50px;
+        position: relative;
+        height: 398px;
+        width: 415.2px;
+    }
+    h2{
+        margin: auto;
+        width: fit-content;
+    }
+    .buttonWrapper{
+        margin: 10px auto;
+        display: flex;
+        justify-content: center;
+    }
+
+}

@@ -2,7 +2,7 @@ import { Button } from 'antd';
 import { LoginOutlined } from '@ant-design/icons';
 import type { NextPage } from 'next';
 import React from 'react';
-import { useConnectWallet } from 'hooks/useconnectwallet';
+import { useConnectWallet } from 'hooks/metamask/useconnectwallet';
 import { useWeb3React } from '@web3-react/core';
 
 const ConnectButton: NextPage = () => {

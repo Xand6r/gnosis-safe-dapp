@@ -8,7 +8,7 @@ const generateEtherscanLink = (address: string, chainId:any) => {
   if(chainId == 1){
     return `https://etherscan.io/address/${address}`
   }
-  return `https://rinkeby.etherscan.io/address/${address}`;
+  return `https://kovan.etherscan.io/address/${address}`;
 };
 
 const ListOwners: NextPage<{
@@ -31,7 +31,7 @@ const ListOwners: NextPage<{
                   {item.label}
                 </a>
               }
-              description={`Token balance: ${item.balance}ETH`}
+              description={`ETH balance: ${item.balance}ETH`}
             />
           </List.Item>
         )}

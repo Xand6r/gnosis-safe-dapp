@@ -1,27 +1,39 @@
-import type { NextPage } from "next";
-import { ethers } from "ethers";
-import EthersAdapter from "@gnosis.pm/safe-ethers-lib";
-import Safe from "@gnosis.pm/safe-core-sdk";
-import { LoadingOutlined } from "@ant-design/icons";
-import { UserAddOutlined, TransactionOutlined } from "@ant-design/icons";
-import styles from "./saleinformation.module.scss";
-import { useEffect, useState } from "react";
-import { useWeb3React } from "@web3-react/core";
-import { Button, Spin, Typography, Popover } from "antd";
-import AddOwner from "../addowner";
-import { toast } from "react-toastify";
-import SendToken from "../sendtoken";
-import ListOwners from "../listowners";
+import type { NextPage } from 'next';
+import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
+import { useWeb3React } from '@web3-react/core';
+import Safe from '@gnosis.pm/safe-core-sdk';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Button, Spin, Typography, Popover, Tooltip } from 'antd';
+import {
+  UserAddOutlined,
+  TransactionOutlined,
+  PlusOutlined
+} from '@ant-design/icons';
+import styles from './saleinformation.module.scss';
+import { useSafe } from 'hooks/safe/usesafe';
+
+import AddOwner from '../addowner';
+import SendToken from '../sendtoken';
+import ListOwners from '../listowners';
+import { useCreateSafe } from 'hooks/safe/usecreatesafe';
+import { toast } from 'react-toastify';
+
 const { Title } = Typography;
 
 const antIcon = <LoadingOutlined style={{ fontSize: 42 }} spin />;
-const SafeInformation: NextPage<{ activeSafe: string }> = ({ activeSafe }) => {
+const SafeInformation: NextPage<{
+  activeSafe: string;
+  onAddSafe: (addr: string) => Promise<void>;
+}> = ({ activeSafe, onAddSafe }) => {
   const { library } = useWeb3React();
+  const { ethAdapter } = useSafe();
+  const { createSafe, loading: createSafeLoading } = useCreateSafe();
   const [loading, setLoading] = useState({
     status: false,
-    message: "",
+    message: ''
   });
-  const [ethBalance, setEthBalance] = useState("0");
+  const [ethBalance, setEthBalance] = useState('0');
   const [safe, setSafe] = useState<Safe>();
   const [owners, setOwners] = useState<
     { address: string; label: string; balance: string }[]
@@ -40,14 +52,10 @@ const SafeInformation: NextPage<{ activeSafe: string }> = ({ activeSafe }) => {
   useEffect(() => {
     if (!activeSafe) return;
     (async function fetchSafeInformation() {
-      setLoading({ status: true, message: "loading safe information" });
-      const ethAdapter = new EthersAdapter({
-        ethers,
-        signer: library.getSigner(),
-      });
+      setLoading({ status: true, message: 'loading safe information' });
       const safeSdk: Safe = await Safe.create({
         ethAdapter: ethAdapter,
-        safeAddress: activeSafe,
+        safeAddress: activeSafe
       });
       setSafe(safeSdk);
       setSafeBalance();
@@ -56,14 +64,14 @@ const SafeInformation: NextPage<{ activeSafe: string }> = ({ activeSafe }) => {
         console.log({ err });
       })
       .finally(() => {
-        setLoading({ status: false, message: "" });
+        setLoading({ status: false, message: '' });
       });
   }, [activeSafe]);
 
   // fetch owners of safe
   async function fetchOwners() {
     if (!safe) return;
-    setLoading({ status: true, message: "loading safe owners" });
+    setLoading({ status: true, message: 'loading safe owners' });
     const owners = await safe.getOwners();
     const ownersDetails = owners.map(async (owner) => {
       const label = await library.lookupAddress(owner);
@@ -72,19 +80,35 @@ const SafeInformation: NextPage<{ activeSafe: string }> = ({ activeSafe }) => {
       return {
         address: owner,
         label: label || owner,
-        balance: (+ethers.utils.formatEther(balance).toString()).toFixed(2),
+        balance: (+ethers.utils.formatEther(balance).toString()).toFixed(2)
       };
     });
     const ownerDetails = await Promise.all(ownersDetails);
     setOwners(ownerDetails);
-    setLoading({ status: false, message: "" });
+    setLoading({ status: false, message: '' });
   }
+
   useEffect(() => {
     fetchOwners();
   }, [safe]);
 
+  const localCreateSafe = async () => {
+    try {
+      setLoading({ ...loading, message: 'Creating safe...' });
+      const createdSafe = await createSafe();
+      const address = createdSafe.getAddress();
+      onAddSafe(address);
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
   return (
-    <Spin indicator={antIcon} spinning={loading.status} tip={loading.message}>
+    <Spin
+      indicator={antIcon}
+      spinning={loading.status || createSafeLoading}
+      tip={loading.message}
+    >
       <div className={styles.safeinformation}>
         <section>
           <section>
@@ -99,6 +123,17 @@ const SafeInformation: NextPage<{ activeSafe: string }> = ({ activeSafe }) => {
           </section>
 
           <div>
+            {/*  */}
+            <Tooltip title="Create safe">
+              <Button
+                type="primary"
+                shape="circle"
+                icon={<PlusOutlined />}
+                size="large"
+                onClick={localCreateSafe}
+              />
+            </Tooltip>
+            {/*  */}
             {/*  */}
             <Popover
               placement="bottom"
@@ -119,7 +154,6 @@ const SafeInformation: NextPage<{ activeSafe: string }> = ({ activeSafe }) => {
               />
             </Popover>
             {/*  */}
-
             {/*  */}
             <Popover
               placement="bottom"

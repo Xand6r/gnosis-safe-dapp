@@ -3,8 +3,8 @@ import { useWeb3React } from '@web3-react/core';
 import { toast } from "react-toastify";
 
 import { injected } from "utils/connectors";
-import { useInactiveListener } from 'hooks/useinactivelistener';
-import { useEagerConnect } from 'hooks/useeagerconnect';
+import { useInactiveListener } from 'hooks/metamask/useinactivelistener';
+import { useEagerConnect } from 'hooks/metamask/useeagerconnect';
 
 export function useConnectWallet() {
   const { connector, activate, error } = useWeb3React();
