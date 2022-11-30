@@ -1,12 +1,13 @@
 import type { NextPage } from 'next';
 import { Input, Button } from 'antd';
 import { useEffect, useState } from 'react';
-import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types';
 import Safe from '@gnosis.pm/safe-core-sdk';
-import { ethers, BigNumber } from 'ethers';
+import { ethers } from 'ethers';
+
 import { toast } from 'react-toastify';
 import { useWeb3React } from '@web3-react/core';
 import erc20ABI from 'data/erc20ABI.json';
+import { useSafeServiceClient } from 'hooks/safe/usesafeserviceclient';
 
 const defaultStyle = { marginBottom: '3px' };
 
@@ -18,35 +19,9 @@ const SendToken: NextPage<{
   const [amount, setAmount] = useState<number>();
   const [address, setAddress] = useState('');
   const { library } = useWeb3React();
+  const { proposeSafeTransaction } = useSafeServiceClient();
 
-  // const sendTransaction = async () => {
-  //   if (!safe) return;
-  //   try {
-  //     setLoading({ status: true, message: 'Transferring funds...' });
-  //     const safeTransactionData: SafeTransactionDataPartial = {
-  //       to: address,
-  //       value: ethers.utils.parseEther(text).toString(),
-  //       data: address
-  //     };
-  //     const safeTransaction = await safe.createTransaction({
-  //       safeTransactionData
-  //     });
-  //     const executeTxResponse = await safe.executeTransaction(safeTransaction);
-  //     await executeTxResponse.transactionResponse?.wait();
-  //     toast.success('Funds Sucesfully sent');
-  //     setText('');
-  //     setSafeBalance();
-  //   } catch (error: any) {
-  //     console.log({ error });
-  //     toast.error(
-  //       `There was an error adding this owner: ${error.reason || error.message}`
-  //     );
-  //   } finally {
-  //     setLoading({ status: false, message: '' });
-  //   }
-  // };
-
-  const sendTokenToSafe = async () => {
+  const ProposeTransferTransaction = async () => {
     if (!safe) return;
     if (!amount || amount <= 0)
       return toast.error('Amount must be greater than 0');
@@ -54,17 +29,25 @@ const SendToken: NextPage<{
       return toast.error('Invalid ERC20 token Address');
     try {
       setLoading({ status: true, message: 'Transferring funds...' });
-      const safeAddress = safe.getAddress();
+      // generate the key values of the transaction
       const erc20Contract = new ethers.Contract(
         address,
         erc20ABI,
         library.getSigner()
       );
       const decimals = await erc20Contract.decimals();
-      const tokenDecimal = BigNumber.from(10).pow(decimals);
-      const transferAmount = BigNumber.from(+amount).mul(tokenDecimal);
-      await erc20Contract.transfer(safeAddress, transferAmount);
-      toast.success('Tokens sent to safe');
+      const transferAmount = ethers.utils.parseUnits('' + amount, +decimals);
+      const {
+        data = '',
+        value = 0,
+        to = ''
+      } = await erc20Contract.populateTransaction.transfer(
+        address,
+        transferAmount
+      );
+      // propose a safe transaction.
+      await proposeSafeTransaction(safe, { to, data, value: +value });
+      toast.success('Transaction has been proposed');
     } catch (error: any) {
       console.log({ error });
       toast.error(
@@ -89,7 +72,7 @@ const SendToken: NextPage<{
       <div style={defaultStyle}>
         <Input onChange={(e) => setAmount(+e.target.value)} placeholder="0.9" />
       </div>
-      <Button onClick={sendTokenToSafe} type="primary">
+      <Button onClick={ProposeTransferTransaction} type="primary">
         Send Token
       </Button>
     </div>

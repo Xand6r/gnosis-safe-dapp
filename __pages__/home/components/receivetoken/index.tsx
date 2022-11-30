@@ -1,7 +1,6 @@
 import type { NextPage } from 'next';
 import { Input, Button } from 'antd';
-import { useEffect, useState } from 'react';
-import { SafeTransactionDataPartial } from '@gnosis.pm/safe-core-sdk-types';
+import { useState } from 'react';
 import Safe from '@gnosis.pm/safe-core-sdk';
 import { ethers, BigNumber } from 'ethers';
 import { toast } from 'react-toastify';
@@ -33,9 +32,9 @@ const SendToken: NextPage<{
         erc20ABI,
         library.getSigner()
       );
+      alert(+amount);
       const decimals = await erc20Contract.decimals();
-      const tokenDecimal = BigNumber.from(10).pow(decimals);
-      const transferAmount = BigNumber.from(+amount).mul(tokenDecimal);
+      const transferAmount = ethers.utils.parseUnits('' + amount, +decimals);
       await erc20Contract.transfer(safeAddress, transferAmount);
       toast.success('Tokens sent to safe');
     } catch (error: any) {

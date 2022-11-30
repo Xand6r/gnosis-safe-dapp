@@ -8,7 +8,8 @@ import { Button, Spin, Typography, Popover, Tooltip } from 'antd';
 import {
   UserAddOutlined,
   TransactionOutlined,
-  PlusOutlined
+  PlusOutlined,
+  SendOutlined
 } from '@ant-design/icons';
 import styles from './saleinformation.module.scss';
 import { useSafe } from 'hooks/safe/usesafe';
@@ -16,7 +17,7 @@ import { useSafe } from 'hooks/safe/usesafe';
 import AddOwner from '../addowner';
 import ReceiveToken from '../receivetoken';
 import ListOwners from '../listowners';
-import SendToken from "../sendtoken";
+import SendToken from '../sendtoken';
 import { useCreateSafe } from 'hooks/safe/usecreatesafe';
 import { toast } from 'react-toastify';
 
@@ -134,6 +135,26 @@ const SafeInformation: NextPage<{
                 onClick={localCreateSafe}
               />
             </Tooltip>
+            {/*  */}
+            {/*  */}
+            <Popover
+              placement="bottom"
+              content={
+                <SendToken
+                  safe={safe}
+                  setLoading={setLoading}
+                  setSafeBalance={setSafeBalance}
+                />
+              }
+              title="Propose ERC20 Token transfer"
+            >
+              <Button
+                type="primary"
+                shape="circle"
+                icon={<SendOutlined />}
+                size="large"
+              />
+            </Popover>
             {/*  */}
             {/*  */}
             <Popover
