@@ -8,7 +8,7 @@ const generateEtherscanLink = (address: string, chainId:any) => {
   if(chainId == 1){
     return `https://etherscan.io/address/${address}`
   }
-  return `https://kovan.etherscan.io/address/${address}`;
+  return `https://goerli.etherscan.io/address/${address}`;
 };
 
 const ListOwners: NextPage<{

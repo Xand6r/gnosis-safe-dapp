@@ -35,8 +35,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Usher Gnosis</title>
-        <meta name="description" content="A tech test for shuaibu alexander" />
+        <title>Gnosis Safe Dapp</title>
+        <meta name="description" content="A Gnosis safe solution by shuaibu alexander" />
         <link rel="icon" href="/assets/metamask.svg" />
       </Head>
       <Web3ReactProvider getLibrary={getLibrary}>

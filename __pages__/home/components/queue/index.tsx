@@ -1,4 +1,5 @@
-import { Spin, Alert } from 'antd';
+import { Spin, Alert, Tag } from 'antd';
+
 import React, { useEffect, useState } from 'react';
 import Safe from '@gnosis.pm/safe-core-sdk';
 import { toast } from 'react-toastify';
@@ -6,6 +7,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 
 import { useSafeServiceClient } from 'hooks/safe/usesafeserviceclient';
 import styles from './queue.module.scss';
+import { useWeb3React } from '@web3-react/core';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 42 }} spin />;
 
@@ -18,6 +20,7 @@ export default function Queue({
 }) {
   const [loading, setLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
+  const { account } = useWeb3React();
 
   const { getAllQueuedTransactions, approveSafeTransactions } =
     useSafeServiceClient();
@@ -27,6 +30,7 @@ export default function Queue({
     setLoading(true);
     getAllQueuedTransactions(safe.getAddress())
       .then((transactions) => {
+        console.log({ transactions });
         setTransactions(transactions);
       })
       .finally(() => {
@@ -56,18 +60,37 @@ export default function Queue({
   return (
     <Spin indicator={antIcon} spinning={loading} tip="Executing Transaction..">
       <div className={styles.queuewrapper}>
-        {transactions.map((t: any) => (
-          <div
-            onClick={() => approveAndExecute(safe, t.safeTxHash)}
-            key={t.safeTxHash}
-          >
-            <section>
-              Approve Token
-              <span>{t.dataDecoded.method}</span> to
-              <span>{t.dataDecoded.parameters[0].value}</span>
-            </section>
-          </div>
-        ))}
+        {transactions.map((txn: any) => {
+          const {
+            safeTxHash,
+            dataDecoded,
+            confirmations,
+            confirmationsRequired
+          } = txn;
+          const gottenConfirmations = confirmations.length;
+          // tag color should be grren if user has approved
+          const tagColor = confirmations.find((c: any) => c.owner === account)
+            ? 'green'
+            : 'red';
+          return (
+            <div
+              onClick={() => approveAndExecute(safe, safeTxHash)}
+              key={safeTxHash}
+            >
+              <section>
+                Approve Token
+                <span>{dataDecoded.method}</span> to
+                <span>{dataDecoded.parameters[0].value}</span>
+                <b>
+                  <Tag color={tagColor}>
+                    {gottenConfirmations} OF {confirmationsRequired}{' '}
+                    Confirmations
+                  </Tag>
+                </b>
+              </section>
+            </div>
+          );
+        })}
       </div>
       {!transactions.length && (
         <Alert

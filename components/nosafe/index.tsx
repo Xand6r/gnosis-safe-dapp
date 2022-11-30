@@ -15,7 +15,7 @@ const NoSafe: NextPage<{
   const localCreateSafe = async () => {
     try {
       const createdSafe = await createSafe();
-      const address =  createdSafe.getAddress();
+      const address = createdSafe.getAddress();
       onAddSafe(address);
     } catch (err: any) {
       toast.error(err.message);

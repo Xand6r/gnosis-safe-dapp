@@ -27,7 +27,7 @@ export function useConnectWallet() {
     let message;
     if (error.name === 'UnsupportedChainIdError') {
       message =
-        'Unsupported network, please connect to Rinkeby or Main network';
+        'Unsupported network, please connect to Goerli or Main network';
     } else {
       message = error.message;
     }

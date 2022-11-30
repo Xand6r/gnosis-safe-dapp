@@ -49,8 +49,9 @@ const SafeInformation: NextPage<{
   >([]);
 
   // refresh the balance of the safe
-  const setSafeBalance = async (safeAddr: string) => {
-    const balances = await fetchSafeTokens(safeAddr);
+  const setSafeBalance = async () => {
+    if(!safe) return;
+    const balances = await fetchSafeTokens(safe.getAddress());
     // show first 3 tokens
     const parsedBalance = balances
       .filter(({ tokenAddress }) => Boolean(tokenAddress))
@@ -79,7 +80,7 @@ const SafeInformation: NextPage<{
         safeAddress: activeSafe
       });
       setSafe(safeSdk);
-      setSafeBalance(safeSdk.getAddress());
+      setSafeBalance();
     })()
       .catch((err) => {
         console.log({ err });
@@ -240,7 +241,7 @@ const SafeInformation: NextPage<{
       </div>
       {isModalOpen && (
         <Modal
-          title="Proposed Transactions (Click to approve transaction)"
+          title="Proposed Transactions (Click transaction to approve )"
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}

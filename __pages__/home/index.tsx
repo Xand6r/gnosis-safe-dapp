@@ -4,11 +4,11 @@ import type { NextPage } from 'next';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import NoSafe from 'components/nosafe';
-import { useFetchSafe } from 'hooks/safe/usefetchsafe';
 import SafeInformation from './components/safeinformation';
 
-const antIcon = <LoadingOutlined style={{ fontSize: 42 }} spin />;
+import { useFetchSafe } from 'hooks/safe/usefetchsafe';
 
+const antIcon = <LoadingOutlined style={{ fontSize: 42 }} spin />;
 const Home: NextPage = () => {
   const { safes, loading, activeSafe, setCurrentSafe, noSafe, addNewSafe } =
     useFetchSafe();

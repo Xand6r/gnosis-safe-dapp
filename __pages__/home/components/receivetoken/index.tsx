@@ -13,7 +13,7 @@ const SendToken: NextPage<{
   safe: Safe | undefined;
   setLoading: any;
   setSafeBalance: () => void;
-}> = ({ safe, setLoading }) => {
+}> = ({ safe, setLoading, setSafeBalance }) => {
   const [amount, setAmount] = useState<number>();
   const [address, setAddress] = useState('');
   const { library } = useWeb3React();
@@ -34,7 +34,9 @@ const SendToken: NextPage<{
       );
       const decimals = await erc20Contract.decimals();
       const transferAmount = ethers.utils.parseUnits('' + amount, +decimals);
-      await erc20Contract.transfer(safeAddress, transferAmount);
+      const tx = await erc20Contract.transfer(safeAddress, transferAmount);
+      await tx.wait();
+      setSafeBalance();
       toast.success('Tokens sent to safe');
     } catch (error: any) {
       console.log({ error });

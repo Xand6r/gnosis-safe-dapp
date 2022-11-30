@@ -23,6 +23,8 @@ export function useSafeServiceClient() {
     ethAdapter
   });
 
+
+
   const getAllQueuedTransactions = async (safeAddress: string) => {
     const allTxsOptions: AllTransactionsOptions = {
       executed: false,
@@ -55,6 +57,8 @@ export function useSafeServiceClient() {
     const executeTxResponse = await safeSDK.executeTransaction(safeTransaction);
     await executeTxResponse.transactionResponse?.wait();
   };
+
+
 
   const proposeSafeTransaction = async (
     safeSDK: Safe,
@@ -96,6 +100,7 @@ export function useSafeServiceClient() {
     const balances: SafeBalanceResponse[] = await safeService.getBalances(safeAddress)
     return balances;
   }
+
   return {
     safeService,
     proposeSafeTransaction,
