@@ -14,8 +14,9 @@ import styles from './saleinformation.module.scss';
 import { useSafe } from 'hooks/safe/usesafe';
 
 import AddOwner from '../addowner';
-import SendToken from '../sendtoken';
+import ReceiveToken from '../receivetoken';
 import ListOwners from '../listowners';
+import SendToken from "../sendtoken";
 import { useCreateSafe } from 'hooks/safe/usecreatesafe';
 import { toast } from 'react-toastify';
 
@@ -138,13 +139,13 @@ const SafeInformation: NextPage<{
             <Popover
               placement="bottom"
               content={
-                <SendToken
+                <ReceiveToken
                   safe={safe}
                   setLoading={setLoading}
                   setSafeBalance={setSafeBalance}
                 />
               }
-              title="Send token from safe"
+              title="Send token to safe"
             >
               <Button
                 type="primary"

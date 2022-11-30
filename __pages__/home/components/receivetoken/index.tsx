@@ -19,33 +19,6 @@ const SendToken: NextPage<{
   const [address, setAddress] = useState('');
   const { library } = useWeb3React();
 
-  // const sendTransaction = async () => {
-  //   if (!safe) return;
-  //   try {
-  //     setLoading({ status: true, message: 'Transferring funds...' });
-  //     const safeTransactionData: SafeTransactionDataPartial = {
-  //       to: address,
-  //       value: ethers.utils.parseEther(text).toString(),
-  //       data: address
-  //     };
-  //     const safeTransaction = await safe.createTransaction({
-  //       safeTransactionData
-  //     });
-  //     const executeTxResponse = await safe.executeTransaction(safeTransaction);
-  //     await executeTxResponse.transactionResponse?.wait();
-  //     toast.success('Funds Sucesfully sent');
-  //     setText('');
-  //     setSafeBalance();
-  //   } catch (error: any) {
-  //     console.log({ error });
-  //     toast.error(
-  //       `There was an error adding this owner: ${error.reason || error.message}`
-  //     );
-  //   } finally {
-  //     setLoading({ status: false, message: '' });
-  //   }
-  // };
-
   const sendTokenToSafe = async () => {
     if (!safe) return;
     if (!amount || amount <= 0)
