@@ -17,7 +17,8 @@ const SendToken: NextPage<{
   setSafeBalance: () => void;
 }> = ({ safe, setLoading }) => {
   const [amount, setAmount] = useState<number>();
-  const [address, setAddress] = useState('');
+  const [tokenAddress, setAddress] = useState('');
+  const [recipient, setRecipient] = useState('');
   const { library } = useWeb3React();
   const { proposeSafeTransaction } = useSafeServiceClient();
 
@@ -25,13 +26,15 @@ const SendToken: NextPage<{
     if (!safe) return;
     if (!amount || amount <= 0)
       return toast.error('Amount must be greater than 0');
-    if (!ethers.utils.isAddress(address))
+    if (!ethers.utils.isAddress(tokenAddress))
       return toast.error('Invalid ERC20 token Address');
+    if (!ethers.utils.isAddress(recipient))
+      return toast.error('Invalid ERC20 recipient Address');
     try {
-      setLoading({ status: true, message: 'Transferring funds...' });
+      setLoading({ status: true, message: 'Proposing Transactions...' });
       // generate the key values of the transaction
       const erc20Contract = new ethers.Contract(
-        address,
+        tokenAddress,
         erc20ABI,
         library.getSigner()
       );
@@ -42,7 +45,7 @@ const SendToken: NextPage<{
         value = 0,
         to = ''
       } = await erc20Contract.populateTransaction.transfer(
-        address,
+        recipient,
         transferAmount
       );
       // propose a safe transaction.
@@ -66,14 +69,21 @@ const SendToken: NextPage<{
         <Input
           onChange={(e) => setAddress(e.target.value)}
           placeholder="ERC20 Token address"
-          value={address}
+          value={tokenAddress}
+        />
+      </div>
+      <div style={defaultStyle}>
+        <Input
+          onChange={(e) => setRecipient(e.target.value)}
+          placeholder="Recipient Address"
+          value={recipient}
         />
       </div>
       <div style={defaultStyle}>
         <Input onChange={(e) => setAmount(+e.target.value)} placeholder="0.9" />
       </div>
       <Button onClick={ProposeTransferTransaction} type="primary">
-        Send Token
+        Propose Transaction
       </Button>
     </div>
   );

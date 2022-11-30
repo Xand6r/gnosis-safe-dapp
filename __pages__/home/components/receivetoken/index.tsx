@@ -32,7 +32,6 @@ const SendToken: NextPage<{
         erc20ABI,
         library.getSigner()
       );
-      alert(+amount);
       const decimals = await erc20Contract.decimals();
       const transferAmount = ethers.utils.parseUnits('' + amount, +decimals);
       await erc20Contract.transfer(safeAddress, transferAmount);

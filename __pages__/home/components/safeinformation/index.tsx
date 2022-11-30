@@ -4,12 +4,13 @@ import { ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import Safe from '@gnosis.pm/safe-core-sdk';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Button, Spin, Typography, Popover, Tooltip } from 'antd';
+import { Button, Spin, Typography, Popover, Tooltip, Modal } from 'antd';
 import {
   UserAddOutlined,
   TransactionOutlined,
   PlusOutlined,
-  SendOutlined
+  SendOutlined,
+  CheckCircleOutlined
 } from '@ant-design/icons';
 import styles from './saleinformation.module.scss';
 import { useSafe } from 'hooks/safe/usesafe';
@@ -20,6 +21,9 @@ import ListOwners from '../listowners';
 import SendToken from '../sendtoken';
 import { useCreateSafe } from 'hooks/safe/usecreatesafe';
 import { toast } from 'react-toastify';
+import { useModal } from 'hooks/usemodal';
+import Queue from '../queue';
+import { useSafeServiceClient } from 'hooks/safe/usesafeserviceclient';
 
 const { Title } = Typography;
 
@@ -31,6 +35,9 @@ const SafeInformation: NextPage<{
   const { library } = useWeb3React();
   const { ethAdapter } = useSafe();
   const { createSafe, loading: createSafeLoading } = useCreateSafe();
+  const { showModal, isModalOpen, handleOk, handleCancel } = useModal();
+  const { fetchSafeTokens } = useSafeServiceClient();
+  const [allTokens, setAllTokens] = useState<any>([]);
   const [loading, setLoading] = useState({
     status: false,
     message: ''
@@ -42,12 +49,24 @@ const SafeInformation: NextPage<{
   >([]);
 
   // refresh the balance of the safe
-  const setSafeBalance = async () => {
-    const safeBalance = await library.getBalance(activeSafe);
-    const parsedBalance = (+ethers.utils
-      .formatEther(safeBalance)
-      .toString()).toFixed(2);
-    setEthBalance(parsedBalance);
+  const setSafeBalance = async (safeAddr: string) => {
+    const balances = await fetchSafeTokens(safeAddr);
+    // show first 3 tokens
+    const parsedBalance = balances
+      .filter(({ tokenAddress }) => Boolean(tokenAddress))
+      .map((singleTokenBalance) => {
+        const {
+          balance,
+          token: { name, decimals }
+        } = singleTokenBalance;
+
+        return {
+          balance: +balance / Math.pow(10, +decimals),
+          name
+        };
+      })
+      .slice(0, 3);
+    setAllTokens(parsedBalance);
   };
 
   // load safe details and initialise safe constructor
@@ -60,7 +79,7 @@ const SafeInformation: NextPage<{
         safeAddress: activeSafe
       });
       setSafe(safeSdk);
-      setSafeBalance();
+      setSafeBalance(safeSdk.getAddress());
     })()
       .catch((err) => {
         console.log({ err });
@@ -118,10 +137,16 @@ const SafeInformation: NextPage<{
               <b>rin: </b>
               {activeSafe}
             </Title>
-            <Title level={4}>
-              <b>ETH Balance: </b>
-              {ethBalance}ETH
-            </Title>
+            <div className={styles.balances}>
+              {allTokens.map((tokenBalance: any) => (
+                <Title key={tokenBalance.name} level={5}>
+                  <b style={{ textTransform: 'capitalize' }}>
+                    {tokenBalance.name.toLowerCase()} Balance:{' '}
+                  </b>
+                  {tokenBalance.balance} {tokenBalance.name.toUpperCase()}
+                </Title>
+              ))}
+            </div>
           </section>
 
           <div>
@@ -133,6 +158,17 @@ const SafeInformation: NextPage<{
                 icon={<PlusOutlined />}
                 size="large"
                 onClick={localCreateSafe}
+              />
+            </Tooltip>
+            {/*  */}
+            {/*  */}
+            <Tooltip title="Proposed Transactions">
+              <Button
+                type="primary"
+                shape="circle"
+                icon={<CheckCircleOutlined />}
+                size="large"
+                onClick={showModal}
               />
             </Tooltip>
             {/*  */}
@@ -166,7 +202,7 @@ const SafeInformation: NextPage<{
                   setSafeBalance={setSafeBalance}
                 />
               }
-              title="Send token to safe"
+              title="Send ERC token to safe"
             >
               <Button
                 type="primary"
@@ -202,6 +238,16 @@ const SafeInformation: NextPage<{
           <ListOwners owners={owners} />
         </section>
       </div>
+      {isModalOpen && (
+        <Modal
+          title="Proposed Transactions (Click to approve transaction)"
+          open={isModalOpen}
+          onOk={handleOk}
+          onCancel={handleCancel}
+        >
+          <Queue safe={safe} refresh={isModalOpen} />
+        </Modal>
+      )}
     </Spin>
   );
 };

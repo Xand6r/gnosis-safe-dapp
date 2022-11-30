@@ -1,5 +1,4 @@
 @import "./variables.scss";
-@import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 @import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -24,4 +23,8 @@ ul.ant-menu{
 
 h4.ant-typography{
   margin-bottom: 0 !important;
+}
+
+.ant-modal-footer{
+  display: none !important;
 }

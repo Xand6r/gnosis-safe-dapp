@@ -30,7 +30,7 @@ const NoSafe: NextPage<{
         <h2>{text}</h2>
         <div className={styles.buttonWrapper}>
           <Button onClick={localCreateSafe} type="primary">
-            Create Safe
+            Create A Safe
           </Button>
         </div>
       </section>

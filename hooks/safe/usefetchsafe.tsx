@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { LockOutlined } from '@ant-design/icons';
 import { getItem } from 'utils/helpers';
 import type { MenuProps } from 'antd';
+import { SafeBalanceResponse } from '@gnosis.pm/safe-service-client';
 
 export function useFetchSafe() {
   const { chainId, account } = useWeb3React();
@@ -74,6 +75,8 @@ export function useFetchSafe() {
       setSafes([...allSafes]);
     }
   };
+
+
 
   return {
     safes,
