@@ -19,6 +19,7 @@ export default function Queue({
   refresh: boolean;
 }) {
   const [loading, setLoading] = useState(true);
+  const [tip, setTip] = useState('');
   const [transactions, setTransactions] = useState([]);
   const { account } = useWeb3React();
 
@@ -28,6 +29,7 @@ export default function Queue({
   function refreshQueuedTransactions() {
     if (!safe) return;
     setLoading(true);
+    setTip('Loading pending transactions');
     getAllQueuedTransactions(safe.getAddress())
       .then((transactions) => {
         console.log({ transactions });
@@ -35,6 +37,7 @@ export default function Queue({
       })
       .finally(() => {
         setLoading(false);
+        setTip('Approving transaction...');
       });
   }
 
@@ -49,7 +52,7 @@ export default function Queue({
       setLoading(true);
       await approveSafeTransactions(safe, hash);
       refreshQueuedTransactions();
-      toast.success('Transaction Sucesfully executed');
+      toast.success('Transaction Sucesfully executed...');
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -58,8 +61,11 @@ export default function Queue({
   };
 
   return (
-    <Spin indicator={antIcon} spinning={loading} tip="Executing Transaction..">
-      <div className={styles.queuewrapper}>
+    <Spin indicator={antIcon} spinning={loading} tip={tip}>
+      <div
+        style={{ minHeight: loading ? '250px' : '0' }}
+        className={styles.queuewrapper}
+      >
         {transactions.map((txn: any) => {
           const {
             safeTxHash,
